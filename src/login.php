@@ -1,12 +1,16 @@
 <?php
 include 'connection.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 // assuming the database exists - cant test this until the database is created and populated with data
 // will need editing to work with the new database, this is just ripped from an old project
 
 $error = '';
     // read button data
+    
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $username = isset($_POST['username']) ? trim($_POST['username']) : '';
+        $username = isset($_POST['email']) ? trim($_POST['email']) : '';
         $password = isset($_POST['password']) ? $_POST['password'] : ''; // hash is ignored for simplicity
 
         if (empty($username) || empty($password)) {
@@ -83,7 +87,6 @@ $error = '';
 		<body>
 			<main>
 				<h1>Sign in to continue to Unify.</h1>
-				<p class="intro"></p>
 				<form action="" method="post">
 					<div class="field">
 						<label for="email">Email address</label>
