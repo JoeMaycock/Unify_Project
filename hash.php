@@ -27,5 +27,5 @@
 <!-- 
 phpMyAdmin details
 
-$conn=mysqli_connect('localhost', 'charlie.burton', '54H4PDBC', 'databasename');
+$conn=mysqli_connect('localhost', 'charlie.burton', '54H4PDBC', 'charlieburton_Unify');
 ->
