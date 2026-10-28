@@ -1,0 +1,39 @@
+Definition of Done
+
+ - Establishing Criteria
+        - Functionality
+            - user stories are viable
+                - refined user stories (3-5 bullet points)
+            - Interactivity
+                - buttons work
+                - error messages / feedback(tell the user whats happening)
+                - intuitive
+                    - clearly labelled
+                    - auto format (input prompts)
+
+
+        - accessibility
+            - colour blindness ( colour scheme/toggles) - no red or green
+            - sight(font size/ initial font)
+            - screen reader
+            - language support
+                - support for foreign currencies
+            - transscript
+            - image descriptions
+            - devices (aspect ratio)
+                - desktop
+                - mobile
+                - tablet
+
+
+        - Testing 
+            - css + html validated
+                - 0 errors
+            - Testing framework
+
+
+
+
+
+
+
