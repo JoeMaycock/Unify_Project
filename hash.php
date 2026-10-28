@@ -10,10 +10,13 @@
             return password_verify($password, $hash);
         }
 
+        // Change password when implementing login system
+        // Change "$placeholder" to appropriate name
         $placeholder = "placeholder password";
 
         $hash = passwordHash($placeholder);
 
+        // Check password matches
         if (passwordVerify($placeholder, $hash)) {
             echo "Verified";
         } else {
