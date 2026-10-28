@@ -1,0 +1,31 @@
+
+name: Sync to Azure DevOps
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to Azure DevOps
+        env:
+          AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
+        run: |
+          set -e
+
+          git remote add azure \
+            https://dev.azure.com/danielbrooke/_git/Unify_Project
+
+          AUTH=$(printf ':%s' "$AZURE_DEVOPS_PAT" | base64 -w0)
+
+          git -c http.extraheader="AUTHORIZATION: basic $AUTH" \
+            push azure HEAD:refs/heads/main
