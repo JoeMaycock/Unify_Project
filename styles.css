@@ -21,3 +21,19 @@ p {
   background-color: white;
   border-radius: 20px;
 }
+
+
+.LogoContainer {
+  position: relative;
+  display: flex;
+  left: 0px;
+  top: 0px;
+  margin: 0px;
+}
+
+.Logo {
+  height: 50px;
+  width: 50px;
+  background-color: white;
+  top: 0px;
+}
