@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     setcookie('login_user', $user['UserName'], time() + 604800, '/', '', false, true);
                     setcookie('login_user_id', $user['UserID'], time() + 604800, '/', '', false, true);
 
-                    echo "Log In Complete";
+                    header('Location: account.php');
 
                     exit;
                 } else {
