@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("connection.php"); // provides $con
 
 // this only works for viewing the account of the currently logged in user
@@ -10,7 +11,7 @@ if ($userID !== false && $userID !== null && $userID > 0) {
     try {
         // fetch basic details from Users
         $query = $con->prepare( 
-            'SELECT UserName, UserEmail, UserStatus, profile_picture FROM Users WHERE UserID = ? LIMIT 1'
+            'SELECT UserName, UserEmail, UserStatus FROM Users WHERE UserID = ? LIMIT 1'
         );
         $query->bind_param('i', $userID);
         $query->execute();

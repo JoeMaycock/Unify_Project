@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     else {
         if (isset($conn)) {
-            $stmt = $conn->prepare('SELECT UserID, UserName, UserPassword FROM users WHERE UserEmail = ? LIMIT 1');
+            $stmt = $conn->prepare('SELECT UserID, UserName, UserPassword FROM Users WHERE UserEmail = ? LIMIT 1');
             $stmt->bind_param('s', $email);
             $stmt->execute();
             $result = $stmt->get_result();
