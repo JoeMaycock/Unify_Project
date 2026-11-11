@@ -10,7 +10,7 @@ if ($userID !== false && $userID !== null && $userID > 0) {
     try {
         // fetch basic details from Users
         $query = $con->prepare( 
-            'SELECT UserName, UserEmail, UserStatus, profile_picture FROM Users WHERE UserID = ? LIMIT 1'
+            'SELECT UserName, UserEmail, UserStatus FROM Users WHERE UserID = ? LIMIT 1'
         );
         $query->bind_param('i', $userID);
         $query->execute();
@@ -56,7 +56,7 @@ function escapeHtml($value)
 
     <!--Top bar -->
     <header>
-        <h1>My App</h1>
+        <h1>My Account</h1>
         <nav class="nav">
             <ul>
                 <li><a href="index.php">Home</a></li>
