@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['user_id'] = $user['UserID'];
                     $_SESSION['username'] = $user['UserName'];
                     setcookie('login_user', $user['UserName'], time() + 604800, '/', '', false, true);
+                    setcookie('login_user_id', $user['UserID'], time() + 604800, '/', '', false, true);
 
                     echo "Log In Complete";
 
