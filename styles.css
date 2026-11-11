@@ -1,0 +1,49 @@
+.box{
+    border: 2px solid, #ABABAB;
+    border-radius:10px ;
+    margin-bottom: 24px;
+    font-family: Arial, Helvetica;
+    box-sizing: border-box;
+    background-color: #FEFCFB;
+    height: 50px;
+}
+
+body {
+  Background: #051e49
+}
+
+p {
+    color: white;
+    font-size: 16px;
+
+}
+
+h1 {
+    color: white;
+
+}
+
+.TopBarContainer {
+  display: flex;
+  justify-content: center;
+  Margin: 10px;
+}
+
+.TopBar {
+  height: 50px;
+  width: 100%;
+  background-color: white;
+  border-radius: 20px;
+}
+
+.ForumThought input[type=text] {
+    text-align: left;
+    width: 100%;
+    margin: 0;
+    padding: 16px;
+}
+
+
+
+
+
