@@ -1,20 +1,36 @@
 <?php
 include("connection.php"); // provides $con
 
+// this only works for viewing the account of the currently logged in user
 $userID = filter_input(INPUT_COOKIE, 'login_user_id', FILTER_VALIDATE_INT);
 $user = null;
 $loadError = false;
 
 if ($userID !== false && $userID !== null && $userID > 0) {
     try {
-        $query = $con->prepare(
-            ''
+        // fetch basic details from Users
+        $query = $con->prepare( 
+            'SELECT UserName, UserEmail, UserStatus, profile_picture FROM Users WHERE UserID = ? LIMIT 1'
         );
         $query->bind_param('i', $userID);
         $query->execute();
         $result = $query->get_result();
         $user = $result->fetch_assoc();
         $query->close();
+
+
+        // fetch bio from account table if it exists
+        if ($user) {
+            $bioQuery = $con->prepare(
+                'SELECT Bio FROM Account WHERE UserID = ? LIMIT 1'
+            );
+            $bioQuery->bind_param('i', $userID);
+            $bioQuery->execute();
+            $bioResult = $bioQuery->get_result();
+            $bio = $bioResult->fetch_assoc();
+            $user['Bio'] = $bio['Bio'] ?? '';
+            $bioQuery->close();
+        }
     } catch (Throwable $exception) {
         $loadError = true;
     }
@@ -22,7 +38,7 @@ if ($userID !== false && $userID !== null && $userID > 0) {
 
 function escapeHtml($value)
 {
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); 
 }
 ?>
 
@@ -58,8 +74,16 @@ function escapeHtml($value)
     <?php else: ?>
         <!-- Account details are loaded using the userID cookie set at login. -->
         <div class="details">
+        
             <div class="pfp">
-                <img src="<?= escapeHtml($user['profile_picture'] ?: 'img/pfp.png') ?>" alt="Profile Picture" style="width:100px; height:100px;">
+                <?php
+                // adds a fallback image if the profile picture is not set or the file does not exist
+                $profilePicture = $user['profile_picture'] ?? '';
+                if ($profilePicture === '' || !is_file(__DIR__ . '/' . ltrim($profilePicture, '/\\'))) {
+                    $profilePicture = 'img/account_default.png';
+                }
+                ?>
+                <img src="<?= escapeHtml($profilePicture) ?>" alt="Profile Picture" width="526" height="526" style="width:526px; height:526px; object-fit:cover;">
             </div>
             <div class="info">
                 <h2><?= escapeHtml($user['name']) ?></h2>
@@ -70,7 +94,7 @@ function escapeHtml($value)
 
         <div class="bio">
             <h3>Bio</h3>
-            <p><?= nl2br(escapeHtml($user['bio'])) ?></p>
+            <p><?= nl2br(escapeHtml($user['Bio'] ?? '')) ?></p>
         </div>
     <?php endif; ?>
 </body>
