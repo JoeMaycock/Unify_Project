@@ -2,6 +2,15 @@
 session_start();
 include("connection.php"); // provides $conn
 
+if (isset($_GET['signout'])) {
+    setcookie('login_user', '', time() - 3600, '/', '', false, true);
+    setcookie('login_user_id', '', time() - 3600, '/', '', false, true);
+    $_SESSION = [];
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+
 // this only works for viewing the account of the currently logged in user
 $userID = filter_input(INPUT_COOKIE, 'login_user_id', FILTER_VALIDATE_INT);
 $user = null;
@@ -23,7 +32,7 @@ if ($userID !== false && $userID !== null && $userID > 0) {
         // fetch bio from account table if it exists
         if ($user) {
             $bioQuery = $conn->prepare(
-                'SELECT Bio FROM Account WHERE UserID = ? LIMIT 1'
+                'SELECT Bio FROM Accounts WHERE UserID = ? LIMIT 1'
             );
             $bioQuery->bind_param('i', $userID);
             $bioQuery->execute();
@@ -63,11 +72,8 @@ function escapeHtml($value)
             <ul>
                 <li><a href="index.php">Home</a></li>
                 <li><a href="account.php">Account</a></li>
-                <li><a href="login.php"> Sign out 
-                    <?php 
-                     setcookie('login_user', $user['UserName'], time() + -604800, '/', '', false, true);
-                    setcookie('login_user_id', $user['UserID'], time() + -604800, '/', '', false, true);
-                ?></a></li>
+                <li><a href="login.php?signout=1"> Sign out </a></li>
+
             </ul>
         </nav>
     </header>
