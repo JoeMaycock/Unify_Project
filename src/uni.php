@@ -29,6 +29,7 @@ $conn->close();
                 echo"<h1>" . $row['UniName'] . "</h1>";
                 echo"<p>" . $row['UniDescription'] . "</p>";
                 echo"<p>" . $row['UniName'] . " is ranked as the number " . $row['UkRank'] . " university in the Uk by Times Higher Education.</p>";
+                echo'<a href="review.php"> see reviews for ' . $row['UniName'] . " university here</a>";
             ?>
         </main>
     </body>
