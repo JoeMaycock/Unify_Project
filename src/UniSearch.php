@@ -6,13 +6,14 @@ if (isset($_POST['university'])) {
 
 	$university = $_POST['university'];
 
-	$sql = "SELECT UniName FROM University WHERE UniName LIKE '%$university%'";
+	$sql = "SELECT UniID, UniName FROM University WHERE UniName LIKE '%$university%'";
 	$result = $conn->query($sql);
 	
-	//w3schools php mysql select
+	// www.w3schools.com/php/php_mysql_select.asp
 	if ($result->num_rows > 0) {
 		while($row = $result->fetch_assoc()) {
-		echo "name: " . $row['UniName'];
+        // https://stackoverflow.com/questions/14179765/display-data-from-database-and-link-it-to-new-page
+		echo "<a href='uni.php?id=" . $row['UniID'] . "'>". $row['UniName'] . "</a><br>";
 		}
 	} else {
 	echo "0 results";
