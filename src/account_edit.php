@@ -9,7 +9,7 @@ $userID = filter_input(INPUT_COOKIE, 'login_user_id', FILTER_VALIDATE_INT);
 $user = null;
 $loadError = false;
 
-if ($userID !== false && $userID !== null && $userID > 0) {
+if ($userID !== false && $userID !== null && $userID > 0) 
     try {
         // fetch basic details from Users
         $query = $conn->prepare( 
@@ -59,7 +59,7 @@ if ($userID !== false && $userID !== null && $userID > 0) {
         // Refresh user data after update
         header("Location: account.php");
         exit;
-
+    }
     } catch (Throwable $exception) {
         echo '<p>' . escapeHtml($exception->getMessage()) . '</p>'; // debug
         $loadError = true;
