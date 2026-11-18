@@ -87,7 +87,7 @@ function escapeHtml($value)
     <?php else: ?>
         <!-- Account details are loaded using the userID cookie set at login. -->
         <div class="details">
-        
+        <A href="account_edit.php">Edit Account</A>
             <div class="pfp">
                 <?php
                 // adds a fallback image if the profile picture is not set or the file does not exist

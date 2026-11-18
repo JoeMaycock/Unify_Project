@@ -2,37 +2,81 @@
 session_start();
 include("connection.php"); // provides $conn
 
-if ($userID !== false && $userID !== null && $userID > 0) 
+
+
+// this only works for viewing the account of the currently logged in user
+$userID = filter_input(INPUT_COOKIE, 'login_user_id', FILTER_VALIDATE_INT);
+$user = null;
+$loadError = false;
+
+if ($userID !== false && $userID !== null && $userID > 0) {
     try {
         // fetch basic details from Users
-        $getinfoquery = $conn->prepare( 
+        $query = $conn->prepare( 
             'SELECT UserName, UserEmail, UserStatus FROM Users WHERE UserID = ? LIMIT 1'
         );
-        $getinfoquery->bind_param('i', $userID);
-        $getinfoquery->execute();
-        $result = $getinfoquery->get_result();
+        $query->bind_param('i', $userID);
+        $query->execute();
+        $result = $query->get_result();
         $user = $result->fetch_assoc();
-        $getinfoquery->close();
+        $query->close();
 
 
-        $getbioquery = $conn->prepare(
-            'SELECT Bio FROM Account WHERE UserID = ? LIMIT 1'
+        // fetch bio from account table if it exists
+        if ($user) {
+            $bioQuery = $conn->prepare(
+                'SELECT Bio FROM Accounts WHERE UserID = ? LIMIT 1'
+            );
+            $bioQuery->bind_param('i', $userID);
+            $bioQuery->execute();
+            $bioResult = $bioQuery->get_result();
+            $bio = $bioResult->fetch_assoc();
+            $user['Bio'] = $bio['Bio'] ?? '';
+            $bioQuery->close();
+        }
+
+    if(isset($_POST['save_changes'])) { {
+        $newUsername = $_POST['username'];
+        $newEmail = $_POST['email'];
+        $newBio = $_POST['bio'];
+
+        // Update Users table
+        $updateUserQuery = $conn->prepare(
+            'UPDATE Users SET UserName = ?, UserEmail = ? WHERE UserID = ?'
         );
-        $getbioquery->bind_param('i', $userID);
-        $getbioquery->execute();
-        $bioResult = $getbioquery->get_result();
-        $bio = $bioResult->fetch_assoc();
-        $user['Bio'] = $bio['Bio'] ?? '';
-        $getbioquery->close();
-        
-            
+        $updateUserQuery->bind_param('ssi', $newUsername, $newEmail, $userID);
+        $updateUserQuery->execute();
+        $updateUserQuery->close();
+
+        // Update Accounts table
+        $updateAccountQuery = $conn->prepare(
+            'UPDATE Accounts SET Bio = ? WHERE UserID = ?'
+        );
+        $updateAccountQuery->bind_param('si', $newBio, $userID);
+        $updateAccountQuery->execute();
+        $updateAccountQuery->close();
+
+        // Refresh user data after update
+        header("Location: account.php");
+        exit;
+
     } catch (Throwable $exception) {
+        echo '<p>' . escapeHtml($exception->getMessage()) . '</p>'; // debug
         $loadError = true;
     }
+}
 
+function escapeHtml($value)
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); 
+}
 ?>
 
-
+    <?php if ($loadError): ?>
+        <p>Unable to load account information.</p>
+    <?php elseif (!$user): ?>
+        <p><?= empty($userID) ? '<a href="login.php">Log in</a> to view your account.' : 'Account not found.' ?></p> 
+    <?php else: ?>
 
 <html>
     <head>
@@ -44,6 +88,14 @@ if ($userID !== false && $userID !== null && $userID > 0)
 
     <div class="account-edit">
         <h1>Edit Account</h1>
+
+<!-- Image Upload Form -->
+        <form action="upload.php" method="post" enctype="multipart/form-data">
+            Select image to upload:
+            <input type="file" name="fileToUpload" id="fileToUpload">
+            <input type="submit" value="Upload Image" name="submit">
+        </form>
+        <!-- Account Edit Form -->
         <form action="account_edit.php" method="post">
 
 
@@ -72,4 +124,5 @@ if ($userID !== false && $userID !== null && $userID > 0)
 
 
             <input type="submit" value="Save Changes">
+
         </form>

@@ -1,7 +1,7 @@
 <?php
 session_start();
 include("hash.php");
-include("connection.php");
+include("connection.php"); // provides $conn
 
 $error = '';
 
