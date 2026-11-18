@@ -2,7 +2,7 @@
 session_start();
 include("connection.php"); // provides $con
 
-if ($userID !== false && $userID !== null && $userID > 0) {
+if ($userID !== false && $userID !== null && $userID > 0) 
     try {
         // fetch basic details from Users
         $getinfoquery = $con->prepare( 
@@ -45,6 +45,8 @@ if ($userID !== false && $userID !== null && $userID > 0) {
     <div class="account-edit">
         <h1>Edit Account</h1>
         <form action="account_edit.php" method="post">
+
+
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['UserName']); ?>" required><br><br>
 
