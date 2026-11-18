@@ -4,8 +4,7 @@ body {
 }
 
 .UnifyLogo {
-  width: auto;
-  height: auto;
+  position: relative;
 }
 
 /* this code is modified from W3Schools link: https://www.w3schools.com/howto/howto_js_responsive_navbar_dropdown.asp */
