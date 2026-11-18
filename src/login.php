@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['username'] = $user['UserName'];
                     setcookie('login_user', $user['UserName'], time() + 604800, '/', '', false, true);
                     setcookie('login_user_id', $user['UserID'], time() + 604800, '/', '', false, true);
-                    echo("Login Success")
+                    echo("Login Success");
                     header('Location: account.php');
 
                     exit;
