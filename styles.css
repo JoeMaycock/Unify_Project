@@ -23,6 +23,14 @@ body {
   font-size: 17px;
 }
 
+.topnav img {
+  width: 45px;
+  height: 60px;
+  float: left;
+  display: block;
+  padding: 14px 16px;
+}
+
 .active {
   background-color: #04AA6D;
   color: white;
@@ -112,3 +120,24 @@ body {
 }
 
 /*end of modified code*/
+
+/*Light and Dark mode*/
+
+.dark-mode {
+  background-color: #092453;
+}
+
+.dark-mode .topnav {
+  background-color: #0A1128;
+}
+
+.moon {
+  position: relative;
+  float: right;
+  padding: 10px 20px;  
+}
+
+.moon:hover {
+  cursor: pointer;
+  
+}
