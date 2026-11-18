@@ -1,6 +1,6 @@
 <!-- This is the base code for the Top Nav bar, add this code to the start of <body> to test it out -->
 
-<div class = "topnav" id="myTopnav">
+ <div class = "topnav" id="myTopnav">
             <div class = "UnifyLogo">
                 <img src="Logo.png">
             </div>      
@@ -35,3 +35,4 @@
                 var element = document.body;
                 element.classList.toggle("dark-mode");
             }
+		</script>
