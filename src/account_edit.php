@@ -9,7 +9,7 @@ $userID = filter_input(INPUT_COOKIE, 'login_user_id', FILTER_VALIDATE_INT);
 $user = null;
 $loadError = false;
 
-if ($userID !== false && $userID !== null && $userID > 0) 
+if ($userID !== false && $userID !== null && $userID > 0) {
     try {
         // fetch basic details from Users
         $query = $conn->prepare( 
@@ -35,30 +35,31 @@ if ($userID !== false && $userID !== null && $userID > 0)
             $bioQuery->close();
         }
 
-    if(isset($_POST['save_changes'])) { 
-        $newUsername = $_POST['username'];
-        $newEmail = $_POST['email'];
-        $newBio = $_POST['bio'];
+        if(isset($_POST['save_changes'])) { 
+            $newUsername = $_POST['username'];
+            $newEmail = $_POST['email'];
+            $newBio = $_POST['bio'];
 
-        // Update Users table
-        $updateUserQuery = $conn->prepare(
-            'UPDATE Users SET UserName = ?, UserEmail = ? WHERE UserID = ?'
-        );
-        $updateUserQuery->bind_param('ssi', $newUsername, $newEmail, $userID);
-        $updateUserQuery->execute();
-        $updateUserQuery->close();
+            // Update Users table
+            $updateUserQuery = $conn->prepare(
+                'UPDATE Users SET UserName = ?, UserEmail = ? WHERE UserID = ?'
+            );
+            $updateUserQuery->bind_param('ssi', $newUsername, $newEmail, $userID);
+            $updateUserQuery->execute();
+            $updateUserQuery->close();
 
-        // Update Accounts table
-        $updateAccountQuery = $conn->prepare(
-            'UPDATE Accounts SET Bio = ? WHERE UserID = ?'
-        );
-        $updateAccountQuery->bind_param('si', $newBio, $userID);
-        $updateAccountQuery->execute();
-        $updateAccountQuery->close();
+            // Update Accounts table
+            $updateAccountQuery = $conn->prepare(
+                'UPDATE Accounts SET Bio = ? WHERE UserID = ?'
+            );
+            $updateAccountQuery->bind_param('si', $newBio, $userID);
+            $updateAccountQuery->execute();
+            $updateAccountQuery->close();
 
-        // Refresh user data after update
-        header("Location: account.php");
-        exit;
+            // Refresh user data after update
+            header("Location: account.php");
+            exit;
+        }
     
     } catch (Throwable $exception) {
         echo '<p>' . escapeHtml($exception->getMessage()) . '</p>'; // debug
