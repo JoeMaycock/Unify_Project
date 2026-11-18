@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unify</title>
+    <!-- Google Fonts Comfortaa -->
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+    <!-- Chart.js CDN for the color-coded pie chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .split-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .split-pane {
+            flex: 1;
+            min-width: 300px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .tag-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+     <header>
+        <nav aria-label="Main Navigation">
+            <h1><a href="index.html" style="text-decoration: none; color: inherit;">Unify</a></h1>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+
+    <main>
+        <section class="hero">
+            <h2>Student Budget Dashboard</h2>
+            <p>Track your allowance, assign category tags, and analyze spending with visual breakdown charts.</p>
+        </section>
+
+        <div class="split-container">
+            <!-- Left Pane: Forms, Summary & Chart -->
+            <div class="split-pane">
+                <section class="interactive-form">
+                                       <form id="budget-form">
+                        <label for="total-budget">Set Total Budget/Allowance:</label>
+                        <input type="number" id="total-budget" name="totalBudget" step="0.01" placeholder="Enter total budget" required>
+                        <button type="submit">Save Budget</button>
+                    </form>
+
+                    <form id="expense-form" style="margin-top: 20px;">
+                        <label for="expense-amount">Expense Amount:</label>
+                        <input type="number" id="expense-amount" name="expenseAmount" step="0.01" placeholder="Enter expense amount" required>
+
+                        
+                        <label for="expense-category">Category Tag:</label>
+                        <select id="expense-category" name="expenseCategory" required>
+                            <option value="Food">Food</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Social">Social</option>
+                            <option value="Subscription">Subscription</option>
+                            <option value="custom-option" style="font-weight: bold; color: #0066cc;">+ Add Custom Category...</option>
+                        </select>
+
+                        <!-- Pop-down custom slot field -->
+                        <div id="custom-category-wrapper" style="display: none; margin-top: 10px; padding: 10px; background: #f9f9f9; border: 1px dashed #ccc; border-radius: 4px;">
+                            <label for="custom-category-input">Enter New Tag Name:</label>
+                            <input type="text" id="custom-category-input" placeholder="e.g. Groceries, Gym">
+                            <button type="button" id="save-custom-tag" style="margin-top: 8px; background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Save Tag</button>
+                        </div>
+                        
+                        <button type="submit" style="margin-top: 15px;">Add Expense</button>
+                    </form>
+
+                </section>
+
+                <section class="hero" style="margin-top: 20px;">
+                    <h3>Summary</h3>
+                    <p>Total Budget: <span id="display-budget">£0.00</span></p>
+                    <p>Total Spent: <span id="display-spent">£0.00</span></p>
+                    <p>Remaining Balance: <span id="display-remaining">£0.00</span></p>
+                </section>
+
+                <!-- Color-Coded Pie Chart Section -->
+                                 <div class="card" style="margin-top: 20px; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <h3>Pie chart Visual</h3>
+                        <div class="chart-container">
+                            <canvas id="expenseChart"></canvas>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+
+            <!-- Right Pane: Split View Table -->
+            <div class="split-pane">
+                <section class="hero" style="height: 100%;">
+                    <h3>Expense Log</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Spent</th>
+                                <th>Left</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expense-table-body">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #777;">No expenses recorded yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Unify Project. All rights reserved.</p>
+    </footer>
+
+    <script src="index.js"></script>
+</body>
+</html>
