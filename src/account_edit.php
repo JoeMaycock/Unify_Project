@@ -1,11 +1,11 @@
 <?php
 session_start();
-include("connection.php"); // provides $con
+include("connection.php"); // provides $conn
 
 if ($userID !== false && $userID !== null && $userID > 0) 
     try {
         // fetch basic details from Users
-        $getinfoquery = $con->prepare( 
+        $getinfoquery = $conn->prepare( 
             'SELECT UserName, UserEmail, UserStatus FROM Users WHERE UserID = ? LIMIT 1'
         );
         $getinfoquery->bind_param('i', $userID);
@@ -15,7 +15,7 @@ if ($userID !== false && $userID !== null && $userID > 0)
         $getinfoquery->close();
 
 
-        $getbioquery = $con->prepare(
+        $getbioquery = $conn->prepare(
             'SELECT Bio FROM Account WHERE UserID = ? LIMIT 1'
         );
         $getbioquery->bind_param('i', $userID);

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("connection.php"); // provides $con
+include("connection.php"); // provides $conn
 
 // this only works for viewing the account of the currently logged in user
 $userID = filter_input(INPUT_COOKIE, 'login_user_id', FILTER_VALIDATE_INT);
@@ -10,7 +10,7 @@ $loadError = false;
 if ($userID !== false && $userID !== null && $userID > 0) {
     try {
         // fetch basic details from Users
-        $query = $con->prepare( 
+        $query = $conn->prepare( 
             'SELECT UserName, UserEmail, UserStatus FROM Users WHERE UserID = ? LIMIT 1'
         );
         $query->bind_param('i', $userID);
@@ -22,7 +22,7 @@ if ($userID !== false && $userID !== null && $userID > 0) {
 
         // fetch bio from account table if it exists
         if ($user) {
-            $bioQuery = $con->prepare(
+            $bioQuery = $conn->prepare(
                 'SELECT Bio FROM Account WHERE UserID = ? LIMIT 1'
             );
             $bioQuery->bind_param('i', $userID);
