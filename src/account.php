@@ -62,6 +62,11 @@ function escapeHtml($value)
             <ul>
                 <li><a href="index.php">Home</a></li>
                 <li><a href="account.php">Account</a></li>
+                <li><a href="login.php"> Sign out 
+                    <?php 
+                     setcookie('login_user', $user['UserName'], time() + -604800, '/', '', false, true);
+                    setcookie('login_user_id', $user['UserID'], time() + -604800, '/', '', false, true);
+                ?></a></li>
             </ul>
         </nav>
     </header>
