@@ -9,11 +9,25 @@ if(isset($_POST['button'])) {
     $time = $_POST['time'];
     $tags = $_POST['tags'];
 
-    $sql = "INSERT INTO events (title, description, capacity, time)
+    $sql = "INSERT INTO Events (Title, Description, Capacity, Time)
     VALUES ('$title', '$description', '$capacity', '$time')";
 
     if ($conn->query($sql) === TRUE) {
         echo "Event Added";
+
+         // https://www.w3schools.com/php/php_mysql_insert_lastid.asp
+         $event_id = $conn->insert_id;
+
+         // https://www.sitepoint.com/community/t/php-explode-white-space-issue/2846
+         $sortedTags = array_map('trim', explode(',', $tags));
+
+         foreach ($sortedTags as $tag) {
+            $sql2 = "INSERT INTO EventTags (Tag, EventID)
+            VALUES ('$tag', '$event_id')";
+            $conn->query($sql2);
+        }
+
+
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
