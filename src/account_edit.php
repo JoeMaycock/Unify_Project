@@ -35,7 +35,7 @@ if ($userID !== false && $userID !== null && $userID > 0)
             $bioQuery->close();
         }
 
-    if(isset($_POST['save_changes'])) { {
+    if(isset($_POST['save_changes'])) { 
         $newUsername = $_POST['username'];
         $newEmail = $_POST['email'];
         $newBio = $_POST['bio'];
@@ -59,7 +59,7 @@ if ($userID !== false && $userID !== null && $userID > 0)
         // Refresh user data after update
         header("Location: account.php");
         exit;
-    }
+    
     } catch (Throwable $exception) {
         echo '<p>' . escapeHtml($exception->getMessage()) . '</p>'; // debug
         $loadError = true;
