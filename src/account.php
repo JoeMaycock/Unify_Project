@@ -33,6 +33,7 @@ if ($userID !== false && $userID !== null && $userID > 0) {
             $bioQuery->close();
         }
     } catch (Throwable $exception) {
+        echo '<p>' . escapeHtml($exception->getMessage()) . '</p>'; // debug
         $loadError = true;
     }
 }
