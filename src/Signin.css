@@ -1,0 +1,25 @@
+.interactive-form {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    max-width: 500px;
+    margin: 0 auto;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.signup {
+    margin: 10px;
+    text-align: center;
+}
+
+input {
+    width: 100%;
+}
+
+.dark-mode .interactive-form {
+  background: var(--Darkcard-color);
+  border: 1px solid var(--Darkborder-color);
+
+}
