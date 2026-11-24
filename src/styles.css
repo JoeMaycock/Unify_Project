@@ -1,6 +1,33 @@
+:root {
+    --Darknav-color: #0A1128;
+    --nav-color: #122145;
+
+    --bg-color: #fcf6f5;
+    --Darkbg-color: #161d34;
+   
+    --text-color: #4a4a4a;
+    --Darktext-color: #fcf6f5;
+
+    --border-color: #e8d7d9;
+    --Darkborder-color: #0e1630;
+
+    /*Budget specific*/
+
+    --primary-color: #728671; /* Sage Green */
+    --primary-hover: #5d6f5c;
+    --accent-color: #f3c6df; /* Soft Baby Pink */
+
+     --card-bg: #ffffff;
+     --Darkcard-color: #29314b;
+
+     /*end of Budget Specific*/
+}
+
 body {
-  background-color: #f2f2f2;
-  font-family: Arial, Helvetica
+  background-color: var(--bg-color);
+  font-family: Arial, Helvetica;
+  margin: 0;
+  padding: 0;
 }
 
 .UnifyLogo {
@@ -10,7 +37,7 @@ body {
 /* this code is modified from W3Schools link: https://www.w3schools.com/howto/howto_js_responsive_navbar_dropdown.asp */
 .topnav {
   overflow: hidden;
-  background-color: #122145;
+  background-color: var(--nav-color);
 }
 
 .topnav a {
@@ -124,20 +151,31 @@ body {
 /*Light and Dark mode*/
 
 .dark-mode {
-  background-color: #092453;
+  background-color: var(--Darkbg-color);
+  color: var(--Darktext-color);
 }
 
 .dark-mode .topnav {
-  background-color: #0A1128;
+  background-color: var(--Darknav-color);
+}
+
+.dark-mode footer {
+  background-color: var(--Darknav-color);
+  border-color: var(--Darkborder-color);
 }
 
 .moon {
   position: relative;
   float: right;
-  padding: 10px 20px;  
+  padding: 10px 20px;
+  background-color: #d7e2de; 
+  border: none;
+  border-radius: 6px;
 }
 
 .moon:hover {
   cursor: pointer;
-  
+  background-color:#c2c9d9;
 }
+
+/* end of light / dark mode */
