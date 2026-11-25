@@ -32,13 +32,14 @@ if ($userID !== false && $userID !== null && $userID > 0) {
         // fetch bio from account table if it exists
         if ($user) {
             $bioQuery = $conn->prepare(
-                'SELECT Bio FROM Accounts WHERE UserID = ? LIMIT 1'
+                'SELECT Bio, ProfilePicture FROM Accounts WHERE UserID = ? LIMIT 1'
             );
             $bioQuery->bind_param('i', $userID);
             $bioQuery->execute();
             $bioResult = $bioQuery->get_result();
             $bio = $bioResult->fetch_assoc();
             $user['Bio'] = $bio['Bio'] ?? '';
+            $user['ProfilePicture'] = $bio['ProfilePicture'] ?? '';
             $bioQuery->close();
         }
     } catch (Throwable $exception) {
@@ -91,7 +92,7 @@ function escapeHtml($value)
             <div class="pfp">
                 <?php
                 // adds a fallback image if the profile picture is not set or the file does not exist
-                $profilePicture = $user['profile_picture'] ?? '';
+                $profilePicture = $user['ProfilePicture'] ?? '';
                 if ($profilePicture === '' || !is_file(__DIR__ . '/' . ltrim($profilePicture, '/\\'))) {
                     $profilePicture = 'img/account_default.png';
                 }

@@ -2,8 +2,8 @@
 session_start();
 
 $conn = null;
-if (file_exists(__DIR__ . '/connection.php')) {
-    require_once __DIR__ . '/connection.php';
+if (file_exists('connection.php')) {
+    require_once 'connection.php';
 }
 
 $userID = filter_input(INPUT_COOKIE, 'login_user_id', FILTER_VALIDATE_INT);
@@ -64,10 +64,69 @@ if ($conn === null) {
                     $updateAccountQuery->bind_param('si', $newBio, $userID);
                     $updateAccountQuery->execute();
                     $updateAccountQuery->close();
-
+                    // Update the profile picture if a new one was uploaded
+                    if (isset($newProfilePicture)) {
+                        $updateprofilePictureQuery = $conn->prepare(
+                            'UPDATE Accounts SET ProfilePicture = ? WHERE UserID = ?'
+                        );
+                        $updateprofilePictureQuery->bind_param('si', $newProfilePicture, $userID);
+                        $updateprofilePictureQuery->execute();
+                        $updateprofilePictureQuery->close();
+                    }
                     header('Location: account.php');
                     exit;
+                    
                 }
+
+              
+                }
+                // Handle profile picture upload
+                if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['Upload_Image'])) {
+                    $targetDir = 'img/';
+                    $targetFile = $targetDir . basename($_FILES['fileToUpload']['name']);
+                    $uploadOk = 1;
+                    $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+                    // Check if image file is a actual image or fake image
+                    $check = getimagesize($_FILES['fileToUpload']['tmp_name']);
+                    if ($check !== false) {
+                        echo 'File is an image - ' . $check['mime'] . '.';
+                        $uploadOk = 1;
+                    } else {
+                        echo 'File is not an image.';
+                        $uploadOk = 0;
+                    }
+
+                    // Check if file already exists, replaces the existing file
+                    if (file_exists($targetFile)) {
+                        // Optionally, you can delete the existing file or handle it as needed
+                        unlink($targetFile); // Deletes the existing file
+                    }
+
+                    // Check file size
+                    if ($_FILES['fileToUpload']['size'] > 500000) {
+                        echo 'Sorry, your file is too large.';
+                        $uploadOk = 0;
+                    }
+
+                    // Allow certain file formats
+                    if (!in_array($imageFileType, ['jpg', 'png', 'jpeg'])) {
+                        echo 'Sorry, only JPG, JPEG, PNG files are allowed.';
+                        $uploadOk = 0;
+                    }
+
+                    // Check if $uploadOk is set to 0 by an error
+                    if ($uploadOk === 0) {
+                        echo 'Sorry, your file was not uploaded.';
+                    } else {
+                        // changes the display photo, but doesnt update the actual image until the user clicks save changes
+                        if (move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $targetFile)) {
+                            echo 'The file ' . htmlspecialchars(basename($_FILES['fileToUpload']['name'])) . ' has been uploaded.';
+                            $newProfilePicture = $targetFile;
+                        } else {
+                            echo 'Sorry, there was an error uploading your file.';
+                        }
+                    }
             }
         }
     } catch (Throwable $exception) {
@@ -93,24 +152,46 @@ if ($conn === null) {
         <?php elseif (!$user): ?>
             <p><?= empty($userID) ? '<a href="login.php">Log in</a> to view your account.' : 'Account not found.' ?></p>
         <?php else: ?>
-            <form action="upload.php" method="post" enctype="multipart/form-data">
-                <label for="fileToUpload">Select image to upload:</label>
-                <input type="file" name="fileToUpload" id="fileToUpload">
-                <input type="submit" value="Upload Image" name="submit">
-            </form>
+
+            <!-- Display the current profile picture -->
+            <div class="current-profile-picture">
+                <?php
+                if (isset($newProfilePicture)) {
+                    $profilePicture = $newProfilePicture;
+                } else {
+                    $profilePicture = $user['ProfilePicture'] ?? '';
+                }
+                if ($profilePicture === '' || !is_file(__DIR__ . '/' . ltrim($profilePicture, '/\\'))) {
+                    $profilePicture = 'img/account_default.png';
+                }
+                ?>
+                <img src="<?= escapeHtml($profilePicture) ?>" alt="Current Profile Picture" width="150" height="150">
+
+
+                <div class="upload-form">
+                    <form action="account_edit.php" method="post" enctype="multipart/form-data">
+                        <label for="fileToUpload">Select image to upload:</label>
+                        <input type="file" name="fileToUpload" id="fileToUpload">
+                        <input type="submit" value="Upload Image" name="Upload_Image">
+                    </form>
+                </div>
+            </div>
+            
 
             <form action="account_edit.php" method="post">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" value="<?= escapeHtml($user['UserName']) ?>" required><br><br>
+                <div class="name-and-email">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" value="<?= escapeHtml($user['UserName']) ?>" required><br><br>
 
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="<?= escapeHtml($user['UserEmail']) ?>" required><br><br>
-
-                <label for="bio">Bio:</label>
-                <textarea id="bio" name="bio" maxlength="1024" oninput="updateBioRemaining()"><?= escapeHtml($user['Bio']) ?></textarea>
-                <span id="bio-remaining" aria-live="polite">1024 characters remaining</span><br><br>
-
-                <input type="submit" name="save_changes" value="Save Changes">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="<?= escapeHtml($user['UserEmail']) ?>" required><br><br>
+                </div>
+                <div class="bio-section">
+                    <label for="bio">Bio:</label>
+                    <textarea id="bio" name="bio" maxlength="1024" oninput="updateBioRemaining()"><?= escapeHtml($user['Bio']) ?></textarea>
+                    <span id="bio-remaining" aria-live="polite">1024 characters remaining</span><br><br>
+                </div>
+                    <input type="submit" name="save_changes" value="Save Changes">
             </form>
 
             <script>
