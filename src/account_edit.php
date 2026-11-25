@@ -1,18 +1,25 @@
 <?php
 session_start();
-include("connection.php"); // provides $conn
 
+$conn = null;
+if (file_exists(__DIR__ . '/connection.php')) {
+    require_once __DIR__ . '/connection.php';
+}
 
-
-// this only works for viewing the account of the currently logged in user
 $userID = filter_input(INPUT_COOKIE, 'login_user_id', FILTER_VALIDATE_INT);
 $user = null;
 $loadError = false;
 
-if ($userID !== false && $userID !== null && $userID > 0) {
+function escapeHtml($value)
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+}
+
+if ($conn === null) {
+    $loadError = true;
+} elseif ($userID !== false && $userID !== null && $userID > 0) {
     try {
-        // fetch basic details from Users
-        $query = $conn->prepare( 
+        $query = $conn->prepare(
             'SELECT UserName, UserEmail, UserStatus FROM Users WHERE UserID = ? LIMIT 1'
         );
         $query->bind_param('i', $userID);
@@ -21,8 +28,6 @@ if ($userID !== false && $userID !== null && $userID > 0) {
         $user = $result->fetch_assoc();
         $query->close();
 
-
-        // fetch bio from account table if it exists
         if ($user) {
             $bioQuery = $conn->prepare(
                 'SELECT Bio FROM Accounts WHERE UserID = ? LIMIT 1'
@@ -33,97 +38,93 @@ if ($userID !== false && $userID !== null && $userID > 0) {
             $bio = $bioResult->fetch_assoc();
             $user['Bio'] = $bio['Bio'] ?? '';
             $bioQuery->close();
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_changes'])) {
+                $newUsername = trim($_POST['username'] ?? '');
+                $newEmail = trim($_POST['email'] ?? '');
+                $newBio = trim($_POST['bio'] ?? '');
+
+                if ($newUsername === '' || !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+                    $loadError = true;
+                } else {
+                    if (strlen($newBio) > 1024) {
+                        $newBio = substr($newBio, 0, 1024);
+                    }
+
+                    $updateUserQuery = $conn->prepare(
+                        'UPDATE Users SET UserName = ?, UserEmail = ? WHERE UserID = ?'
+                    );
+                    $updateUserQuery->bind_param('ssi', $newUsername, $newEmail, $userID);
+                    $updateUserQuery->execute();
+                    $updateUserQuery->close();
+
+                    $updateAccountQuery = $conn->prepare(
+                        'INSERT INTO Accounts (UserID, Bio) VALUES (?, ?)
+                         ON DUPLICATE KEY UPDATE Bio = VALUES(Bio)'
+                    );
+                    $updateAccountQuery->bind_param('is', $userID, $newBio);
+                    $updateAccountQuery->execute();
+                    $updateAccountQuery->close();
+
+                    header('Location: account.php');
+                    exit;
+                }
+            }
         }
-
-        if(isset($_POST['save_changes'])) { 
-            $newUsername = $_POST['username'];
-            $newEmail = $_POST['email'];
-            $newBio = $_POST['bio'];
-
-            // Update Users table
-            $updateUserQuery = $conn->prepare(
-                'UPDATE Users SET UserName = ?, UserEmail = ? WHERE UserID = ?'
-            );
-            $updateUserQuery->bind_param('ssi', $newUsername, $newEmail, $userID);
-            $updateUserQuery->execute();
-            $updateUserQuery->close();
-
-            // Update Accounts table
-            $updateAccountQuery = $conn->prepare(
-                'UPDATE Accounts SET Bio = ? WHERE UserID = ?'
-            );
-            $updateAccountQuery->bind_param('si', $newBio, $userID);
-            $updateAccountQuery->execute();
-            $updateAccountQuery->close();
-
-            // Refresh user data after update
-            header("Location: account.php");
-            exit;
-        }
-    
     } catch (Throwable $exception) {
-        echo '<p>' . escapeHtml($exception->getMessage()) . '</p>'; // debug
+        error_log('Account edit error: ' . $exception->getMessage());
         $loadError = true;
     }
 }
-
-function escapeHtml($value)
-{
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); 
-}
 ?>
 
-    <?php if ($loadError): ?>
-        <p>Unable to load account information.</p>
-    <?php elseif (!$user): ?>
-        <p><?= empty($userID) ? '<a href="login.php">Log in</a> to view your account.' : 'Account not found.' ?></p> 
-    <?php else: ?>
-
-<html>
-    <head>
-        <title>Edit Account</title>
-    </head>
-
-
-
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Account</title>
+</head>
+<body>
     <div class="account-edit">
         <h1>Edit Account</h1>
 
-<!-- Image Upload Form -->
-        <form action="upload.php" method="post" enctype="multipart/form-data">
-            Select image to upload:
-            <input type="file" name="fileToUpload" id="fileToUpload">
-            <input type="submit" value="Upload Image" name="submit">
-        </form>
-        <!-- Account Edit Form -->
-        <form action="account_edit.php" method="post">
+        <?php if ($loadError): ?>
+            <p>Unable to load or update account information. Please check the database connection and try again.</p>
+        <?php elseif (!$user): ?>
+            <p><?= empty($userID) ? '<a href="login.php">Log in</a> to view your account.' : 'Account not found.' ?></p>
+        <?php else: ?>
+            <form action="upload.php" method="post" enctype="multipart/form-data">
+                <label for="fileToUpload">Select image to upload:</label>
+                <input type="file" name="fileToUpload" id="fileToUpload">
+                <input type="submit" value="Upload Image" name="submit">
+            </form>
 
+            <form action="account_edit.php" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="<?= escapeHtml($user['UserName']) ?>" required><br><br>
 
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['UserName']); ?>" required><br><br>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="<?= escapeHtml($user['UserEmail']) ?>" required><br><br>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['UserEmail']); ?>" required><br><br>
+                <label for="bio">Bio:</label>
+                <textarea id="bio" name="bio" maxlength="1024" oninput="updateBioRemaining()"><?= escapeHtml($user['Bio']) ?></textarea>
+                <span id="bio-remaining" aria-live="polite">1024 characters remaining</span><br><br>
 
+                <input type="submit" name="save_changes" value="Save Changes">
+            </form>
 
-
-            <label for="bio">Bio:</label> 
-            <textarea id="bio" name="bio" maxlength="1024" oninput="updateBioRemaining() "><?php echo htmlspecialchars($user['Bio']); ?></textarea>
-            <span id="bio-remaining" aria-live="polite">1024 characters remaining</span><br><br>
             <script>
                 function updateBioRemaining() {
                     const bio = document.getElementById('bio');
                     const remaining = 1024 - bio.value.length;
-                    document.getElementById('bio-remaining').textContent = remaining + ' characters remaining';
+                    document.getElementById('bio-remaining').textContent =
+                        remaining + ' characters remaining';
                 }
 
                 updateBioRemaining();
             </script>
-
-
-
-
-            <input type="submit" value="Save Changes">
-
-        </form>
+        <?php endif; ?>
+    </div>
+</body>
+</html>
