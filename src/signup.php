@@ -8,9 +8,10 @@ if(isset($_POST['button'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
     $hashed = password_hash($password, PASSWORD_DEFAULT);
+    $status = $_POST['status'];
 
     $sql = "INSERT INTO Users (UserName, UserEmail, UserPassword, UserStatus)
-    VALUES ('$username', '$email', '$hashed', 1)"; //Chnage 1, need dropdown to select student, staff, comapany
+    VALUES ('$username', '$email', '$hashed', '$status')";
 
     if ($conn->query($sql) === TRUE) {
         echo "Account Added";
@@ -53,6 +54,13 @@ $conn->close();
                     <label for="password">Password</label>
                     <input id="password" name="password" type="password" placeholder="password" required>
                 </div>
+
+                <select name="status" id="status">
+                    <option value="">--- User Type: ---</option>
+                    <option value="1">Student</option>
+                    <option value="2">Staff</option>
+                    <option value="3">Company</option>
+                </select>
                 
                 <button type="submit" name="button">Sign up</button>
             </form> 
@@ -62,3 +70,6 @@ $conn->close();
         
     </body>
 </html>
+
+
+<!-- Add entry to accounts table when signed up -->
