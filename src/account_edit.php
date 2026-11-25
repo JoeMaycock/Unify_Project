@@ -59,10 +59,9 @@ if ($conn === null) {
                     $updateUserQuery->close();
 
                     $updateAccountQuery = $conn->prepare(
-                        'INSERT INTO Accounts (UserID, Bio) VALUES (?, ?)
-                         ON DUPLICATE KEY UPDATE Bio = VALUES(Bio)'
+                        'UPDATE Accounts SET Bio = ? WHERE UserID = ?'
                     );
-                    $updateAccountQuery->bind_param('is', $userID, $newBio);
+                    $updateAccountQuery->bind_param('si', $newBio, $userID);
                     $updateAccountQuery->execute();
                     $updateAccountQuery->close();
 
