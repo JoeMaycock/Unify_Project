@@ -1,7 +1,7 @@
 <?php
 session_start();
 include("hash.php");
-include("connection.php");
+include("connection.php"); // provides $conn
 
 $error = '';
 
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     else {
         if (isset($conn)) {
-            $stmt = $conn->prepare('SELECT UserID, UserName, UserPassword FROM users WHERE UserEmail = ? LIMIT 1');
+            $stmt = $conn->prepare('SELECT UserID, UserName, UserPassword FROM Users WHERE UserEmail = ? LIMIT 1');
             $stmt->bind_param('s', $email);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['username'] = $user['UserName'];
                     setcookie('login_user', $user['UserName'], time() + 604800, '/', '', false, true);
                     setcookie('login_user_id', $user['UserID'], time() + 604800, '/', '', false, true);
-
+                    echo("Login Success");
                     header('Location: account.php');
 
                     exit;
@@ -64,7 +64,7 @@ $conn->close();
 		</head>
 
 		<!--Top bar (navigation) -->
-		<div class="top-bar">
+		<div class="topnav">
             <nav class="nav-navbar">
                 <a href="index.html" class="logo-link">
                 <img src="img/logo.png" alt="Unify Logo" style="width:80px; height:80px;">

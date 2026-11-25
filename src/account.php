@@ -1,5 +1,15 @@
 <?php
-include("connection.php"); // provides $con
+session_start();
+include("connection.php"); // provides $conn
+
+if (isset($_GET['signout'])) {
+    setcookie('login_user', '', time() - 3600, '/', '', false, true);
+    setcookie('login_user_id', '', time() - 3600, '/', '', false, true);
+    $_SESSION = [];
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
 
 // this only works for viewing the account of the currently logged in user
 $userID = filter_input(INPUT_COOKIE, 'login_user_id', FILTER_VALIDATE_INT);
@@ -9,7 +19,7 @@ $loadError = false;
 if ($userID !== false && $userID !== null && $userID > 0) {
     try {
         // fetch basic details from Users
-        $query = $con->prepare( 
+        $query = $conn->prepare( 
             'SELECT UserName, UserEmail, UserStatus FROM Users WHERE UserID = ? LIMIT 1'
         );
         $query->bind_param('i', $userID);
@@ -21,8 +31,8 @@ if ($userID !== false && $userID !== null && $userID > 0) {
 
         // fetch bio from account table if it exists
         if ($user) {
-            $bioQuery = $con->prepare(
-                'SELECT Bio FROM Account WHERE UserID = ? LIMIT 1'
+            $bioQuery = $conn->prepare(
+                'SELECT Bio FROM Accounts WHERE UserID = ? LIMIT 1'
             );
             $bioQuery->bind_param('i', $userID);
             $bioQuery->execute();
@@ -32,6 +42,7 @@ if ($userID !== false && $userID !== null && $userID > 0) {
             $bioQuery->close();
         }
     } catch (Throwable $exception) {
+        echo '<p>' . escapeHtml($exception->getMessage()) . '</p>'; // debug
         $loadError = true;
     }
 }
@@ -61,6 +72,8 @@ function escapeHtml($value)
             <ul>
                 <li><a href="index.php">Home</a></li>
                 <li><a href="account.php">Account</a></li>
+                <li><a href="login.php?signout=1"> Sign out </a></li>
+
             </ul>
         </nav>
     </header>
@@ -74,7 +87,7 @@ function escapeHtml($value)
     <?php else: ?>
         <!-- Account details are loaded using the userID cookie set at login. -->
         <div class="details">
-        
+        <A href="account_edit.php">Edit Account</A>
             <div class="pfp">
                 <?php
                 // adds a fallback image if the profile picture is not set or the file does not exist
